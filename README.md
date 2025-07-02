@@ -71,13 +71,26 @@ chmod +x extract_conversation.sh
 Claude stores session logs in the following directory structure:
 
 ```
-~/.claude/projects/<project-name>/<session-id>.jsonl
+~/.claude/projects/<project-folder>/<session-id>.jsonl
 ```
 
 Where:
 - `~/.claude/` is the Claude configuration directory
-- `<project-name>` is derived from your working directory (e.g., `-home-mike-myproject`)
+- `<project-folder>` is derived from your working directory's full path
 - `<session-id>` is a UUID for each Claude session
+
+### Project Folder Naming Convention
+
+The project folder name is created by converting your working directory's absolute path:
+- All forward slashes (`/`) are replaced with hyphens (`-`)
+- The folder name starts with a hyphen
+
+Examples:
+- Working in `/home/alice/projects/my-website` → Logs in `~/.claude/projects/-home-alice-projects-my-website/`
+- Working in `/home/bob/My Big Project` → Logs in `~/.claude/projects/-home-bob-My Big Project/`
+- Working in `/var/www/client_app` → Logs in `~/.claude/projects/-var-www-client_app/`
+
+Note: The project folder name preserves spaces and special characters from your directory names.
 
 ### Finding Your Session Logs
 
@@ -85,12 +98,26 @@ Where:
 # List all Claude project directories
 ls -la ~/.claude/projects/
 
-# Find recent session files
+# Find recent session files (modified in last 24 hours)
 find ~/.claude/projects/ -name "*.jsonl" -type f -mtime -1
 
-# Find logs for a specific project
-ls -la ~/.claude/projects/*myproject*/
+# Find logs for a specific project (use wildcards for partial matches)
+ls -la ~/.claude/projects/*my-website*/
+
+# Find the most recent session file across all projects
+find ~/.claude/projects/ -name "*.jsonl" -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-
+
+# Find logs for your current working directory
+PROJECT_DIR=$(pwd | sed 's|/|-|g')
+ls -la ~/.claude/projects/"$PROJECT_DIR"/
 ```
+
+### Session File Structure
+
+Each session creates a new JSONL file named with a UUID:
+- Example: `6dfe6d65-a9e7-4b2d-95d5-a3057310ecbb.jsonl`
+- Files are created when a session starts and appended to throughout the session
+- Multiple sessions in the same project directory will create separate files
 
 ### JSONL Structure
 
