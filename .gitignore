@@ -1,0 +1,39 @@
+# Test outputs
+*.html
+test_*
+
+# Session files
+*.jsonl
+*.json
+
+# Environment and sensitive files
+.env
+.env.*
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
+config.local.*
+
+# macOS
+.DS_Store
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.bak
+*~
+*.log
+
+# OS generated files
+Thumbs.db
+Desktop.ini
