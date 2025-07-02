@@ -50,6 +50,7 @@ chmod +x extract_conversation.sh
 
 - `<jsonl_file>`: Path to the Claude session JSONL file (required)
 - `[output_format]`: Output format - `text` (default), `markdown`, or `html` (optional)
+- `--include-tool-content`: Include full tool input/output in the extraction (optional)
 
 ### Examples
 
@@ -62,6 +63,12 @@ chmod +x extract_conversation.sh
 
 # Extract as HTML and save to file
 ./extract_conversation.sh ~/.claude/projects/my-project/session.jsonl html > conversation.html
+
+# Include full tool content (file writes, command outputs, etc.)
+./extract_conversation.sh ~/.claude/projects/my-project/session.jsonl text --include-tool-content
+
+# Extract as markdown with tool content
+./extract_conversation.sh ~/.claude/projects/my-project/session.jsonl markdown --include-tool-content > full_conversation.md
 ```
 
 ## Claude Log Files

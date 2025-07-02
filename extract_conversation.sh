@@ -1,17 +1,27 @@
 #!/bin/bash
 
 # Script to extract conversation history from Claude session JSONL files
-# Usage: ./extract_conversation.sh <jsonl_file> [output_format]
+# Usage: ./extract_conversation.sh <jsonl_file> [output_format] [options]
 # Output formats: text (default), markdown, html
+# Options: --include-tool-content (show full tool input/output)
 
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 <jsonl_file> [output_format]"
+    echo "Usage: $0 <jsonl_file> [output_format] [options]"
     echo "Output formats: text (default), markdown, html"
+    echo "Options: --include-tool-content (show full tool input/output)"
     exit 1
 fi
 
 JSONL_FILE="$1"
 FORMAT="${2:-text}"
+INCLUDE_TOOL_CONTENT=false
+
+# Check for options
+for arg in "$@"; do
+    if [ "$arg" = "--include-tool-content" ]; then
+        INCLUDE_TOOL_CONTENT=true
+    fi
+done
 
 if [ ! -f "$JSONL_FILE" ]; then
     echo "Error: File '$JSONL_FILE' not found"
@@ -29,7 +39,7 @@ SUMMARY=$(jq -r 'select(.type == "summary") | .summary' "$JSONL_FILE" 2>/dev/nul
 
 # Function to extract content from different message structures
 extract_content() {
-    jq -r '
+    jq -r --argjson include_tool "$INCLUDE_TOOL_CONTENT" '
         if .message then
             if .message.content then
                 if (.message.content | type) == "array" then
@@ -37,8 +47,18 @@ extract_content() {
                         if type == "object" then
                             if .text then .text
                             elif .type == "text" and .text then .text
-                            elif .type == "tool_use" then "[Tool use: " + .name + "]"
-                            elif .type == "tool_result" then "[Tool result]"
+                            elif .type == "tool_use" then 
+                                if $include_tool then
+                                    "=== Tool use: " + .name + " ===\n" + (.input | tostring)
+                                else
+                                    "[Tool use: " + .name + "]"
+                                end
+                            elif .type == "tool_result" then 
+                                if $include_tool then
+                                    "=== Tool result ===\n" + (.content // "No result")
+                                else
+                                    "[Tool result]"
+                                end
                             else "[" + (.type // "unknown") + "]"
                             end
                         else .
@@ -56,8 +76,18 @@ extract_content() {
                     if type == "object" then
                         if .text then .text
                         elif .type == "text" and .text then .text
-                        elif .type == "tool_use" then "[Tool use: " + .name + "]"
-                        elif .type == "tool_result" then "[Tool result]"
+                        elif .type == "tool_use" then 
+                            if $include_tool then
+                                "=== Tool use: " + .name + " ===\n" + (.input | tostring)
+                            else
+                                "[Tool use: " + .name + "]"
+                            end
+                        elif .type == "tool_result" then 
+                            if $include_tool then
+                                "=== Tool result ===\n" + (.content // "No result")
+                            else
+                                "[Tool result]"
+                            end
                         else "[" + (.type // "unknown") + "]"
                         end
                     else .
