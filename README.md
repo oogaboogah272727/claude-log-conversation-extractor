@@ -18,7 +18,7 @@ Claude Code stores session logs in JSONL (JSON Lines) format, containing the ful
 
 ```bash
 # Clone the repository
-git clone https://github.com/SRKConsulting/claude-log-conversation-extractor.git
+git clone https://github.com/oogaboogah272727/claude-log-conversation-extractor.git
 cd claude-log-conversation-extractor
 
 # Make the script executable
@@ -199,7 +199,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Author
 
-Created by [SRK Consulting](https://github.com/SRKConsulting)
+Created by [Mike Olsen](https://github.com/oogaboogah272727)
 
 ## Acknowledgments
 
