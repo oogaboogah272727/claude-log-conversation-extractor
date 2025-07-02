@@ -1,6 +1,8 @@
 # Test outputs
 *.html
 test_*
+sample_*
+error_*
 
 # Session files
 *.jsonl
