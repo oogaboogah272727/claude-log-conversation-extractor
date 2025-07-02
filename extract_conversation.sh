@@ -33,7 +33,17 @@ extract_content() {
         if .message then
             if .message.content then
                 if (.message.content | type) == "array" then
-                    .message.content | map(if .text then .text else . end) | join("\n")
+                    .message.content | map(
+                        if type == "object" then
+                            if .text then .text
+                            elif .type == "text" and .text then .text
+                            elif .type == "tool_use" then "[Tool use: " + .name + "]"
+                            elif .type == "tool_result" then "[Tool result]"
+                            else "[" + (.type // "unknown") + "]"
+                            end
+                        else .
+                        end
+                    ) | join("\n")
                 else
                     .message.content
                 end
@@ -42,7 +52,17 @@ extract_content() {
             end
         elif .content then
             if (.content | type) == "array" then
-                .content | map(if .text then .text else . end) | join("\n")
+                .content | map(
+                    if type == "object" then
+                        if .text then .text
+                        elif .type == "text" and .text then .text
+                        elif .type == "tool_use" then "[Tool use: " + .name + "]"
+                        elif .type == "tool_result" then "[Tool result]"
+                        else "[" + (.type // "unknown") + "]"
+                        end
+                    else .
+                    end
+                ) | join("\n")
             else
                 .content
             end
